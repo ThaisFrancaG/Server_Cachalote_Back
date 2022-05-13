@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
+  signUpDate DateTime @default(now())
+
+
+  userPrefences     UserPreferences[]
+  userNotifications UserNotifications[]
+  relationsOne      Relations[]         @relation("whoAsked")
+  relationsTwo      Relations[]         @relation("wasAsked")
+
+  @@map("users")
+}
+
+model UserPreferences {
+  id          Int     @id @default(autoincrement())
+  user        Users   @relation(fields: [userID], references: [id])
+  userID      Int
+  avatar      String?
+  likesBooks  Boolean @default(true)
+  likesNovels Boolean @default(true)
+  likesManga  Boolean @default(true)
+  likesComics Boolean @default(true)
+
+  @@map("userPreferences")
+}
+
+model UserNotifications {
+  id          Int     @id @default(autoincrement())
+  user        Users   @relation(fields: [userID], references: [id])
+  userID      Int
+  showPublic  Boolean @default(true)
+  showFriends Boolean @default(true)
+  getPublic   Boolean @default(true)
+  getFriends  Boolean @default(true)
+
+  @@map("userNotifications")
+}
+
+model Relations {
+  id         Int     @id @default(autoincrement())
+  userAsking Users   @relation("whoAsked", fields: [whoAskedID], references: [id])
+  whoAskedID Int
+  userAsked  Users   @relation("wasAsked", fields: [wasAskedID], references: [id])
+  wasAskedID Int
+  confirmed  Boolean @default(false)
+
+  @@map("relations")
+}
+
+// https://www.prisma.io/docs/concepts/components/prisma-schema/relations#disambiguating-relations
