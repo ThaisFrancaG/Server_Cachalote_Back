@@ -9,5 +9,13 @@ async function signUp(req: Request, res: Response) {
   res.sendStatus(201);
 }
 
-const authController = { signUp };
+async function signIn(req: Request, res: Response) {
+  const userData = req.body;
+  console.log(userData);
+  const token = await userServices.signIn(userData);
+
+  res.status(200).send(token);
+}
+
+const authController = { signUp, signIn };
 export default authController;
