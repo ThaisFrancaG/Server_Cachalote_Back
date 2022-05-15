@@ -20,8 +20,9 @@ The routes here presented allow one to create a new user, a new seessions, add b
 </br>
 </br>
 <div align="right">
-Check the related App repository here:
+Check the related App repository here: <a href="https://github.com/ThaisFrancaG/App_Cachalote_Front"> Cachalote Front GitHub </a>
 </div>
+
 # Routes and Usage
 
 ## 🐳 UNDER CONSTRUCTION 🐳
