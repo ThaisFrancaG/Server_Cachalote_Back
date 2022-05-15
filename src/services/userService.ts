@@ -5,3 +5,6 @@ async function truncate() {
 }
 
 export default { truncate };
+export function signUp(userData: any) {
+  throw new Error("Function not implemented.");
+}
