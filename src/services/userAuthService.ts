@@ -22,7 +22,7 @@ async function signUp(createUserData: UpData) {
       message: "Já existe uma conta para esse e-mail! Por favor, faça login",
     };
   }
-  console.log(name);
+
   try {
     await newUser(name, email, password);
   } catch (error) {
@@ -44,6 +44,8 @@ async function signIn(createUserData: UpData) {
   }
   await checkPassword(user[0].password, password);
   const token = await newSession(email);
+
+  return token;
 }
 
 async function checkUser(email: string) {
@@ -68,9 +70,19 @@ async function newUser(name: string, email: string, password: string) {
 
 async function newSession(email: string) {
   const passKey = process.env.JWT_SECRET as string;
-  const token = jwt.sign(email, passKey);
-  console.log(token);
-  return token;
+  try {
+    const token = jwt.sign({ email: email }, passKey, {
+      expiresIn: "30d",
+      algorithm: "HS256",
+    });
+
+    return token;
+  } catch (error) {
+    throw {
+      code: 400,
+      message: "Não foi possível realizar login \n Tente novamente mais tarde",
+    };
+  }
 }
 
 export { signUp, signIn };
