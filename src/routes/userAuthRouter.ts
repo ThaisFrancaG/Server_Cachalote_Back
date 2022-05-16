@@ -9,5 +9,10 @@ userAuthRouter.post(
   validateSchema(userSchema.signUpSchema),
   authController.signUp
 );
+userAuthRouter.post(
+  "/sign-in",
+  validateSchema(userSchema.signInSchema),
+  authController.signIn
+);
 
 export default userAuthRouter;
