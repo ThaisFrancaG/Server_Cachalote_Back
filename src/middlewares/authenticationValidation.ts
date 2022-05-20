@@ -8,6 +8,7 @@ export async function authenticationValidation(
   next: NextFunction
 ) {
   const authorization = req.headers["authorization"];
+
   const tokenError = {
     code: 401,
     message: "Por favor, faça o login ou atualize a página!",
@@ -16,17 +17,15 @@ export async function authenticationValidation(
     throw { code: 400, message: "Por favor, confira suas informações" };
 
   const token = authorization.replace("Bearer ", "");
+
   if (!token) throw tokenError;
   try {
     const passKey = process.env.JWT_SECRET as string;
     const { email } = jwt.verify(token, passKey) as { email: string };
-
     const user = await checkUser(email);
-
     if (user.length === 0) {
       throw tokenError;
     }
-
     next();
   } catch {
     throw tokenError;

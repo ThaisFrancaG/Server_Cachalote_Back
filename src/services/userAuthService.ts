@@ -75,7 +75,7 @@ async function newSession(email: string) {
       expiresIn: "30d",
       algorithm: "HS256",
     });
-    console.log(token);
+
     return token;
   } catch (error) {
     throw {

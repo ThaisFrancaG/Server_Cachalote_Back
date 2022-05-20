@@ -1,8 +1,12 @@
 import { prisma } from "../database.js";
-
+interface UserData {
+  id: number;
+  email: string;
+  password: string;
+}
 async function userByEmail(email: string) {
   try {
-    const results = await prisma.users.findMany({
+    const results: any = await prisma.users.findMany({
       where: { email },
     });
     return results;
