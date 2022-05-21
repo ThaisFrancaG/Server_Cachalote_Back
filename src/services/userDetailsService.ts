@@ -25,6 +25,11 @@ interface ProfilePreferences {
   likesComics?: boolean;
 }
 
+const badRequest = {
+  code: 400,
+  message: "Algo deu errado! \n Confira seus dados",
+};
+
 interface NotificationsPreferences {
   userId: number;
   showPublic?: boolean;
@@ -38,7 +43,15 @@ async function profilePreferences(
 ) {
   const userInfo = await userData(token);
   const userId = userInfo.id;
-  const { nickname, avatar, books, mangas, novels, comics } = userPreferences;
+  let { nickname, avatar, books, mangas, novels, comics } = userPreferences;
+  if (avatar === "") {
+    avatar = "default";
+  }
+  if (nickname === "") {
+    const getUser = await userRepository.userById(userId);
+
+    nickname = getUser.name;
+  }
   const profileInfo = {
     userId: userId,
     avatar: avatar,
@@ -54,10 +67,7 @@ async function profilePreferences(
   } else if (preferences === "create") {
     await createProfile(profileInfo);
   } else {
-    throw {
-      code: 400,
-      message: "Algo deu errado! \n Confira seus dados",
-    };
+    throw badRequest;
   }
 }
 
@@ -85,10 +95,7 @@ async function notificationsPreferences(
   } else if (preferences === "create") {
     await createNotifications(profileInfo);
   } else {
-    throw {
-      code: 400,
-      message: "Algo deu errado! \n Confira seus dados",
-    };
+    throw badRequest;
   }
 }
 
@@ -96,19 +103,14 @@ async function checkPreferences(userId: number, preferences: string) {
   let currentPreferences;
 
   if (preferences === "profile") {
-    console.log("conferir preferencias profile");
     currentPreferences = await preferencesRepository.profilePreferencesById(
       userId
     );
-    console.log("profile" + currentPreferences);
   } else if (preferences === "notifications") {
     currentPreferences =
       await preferencesRepository.notificationsPreferencesById(userId);
   } else {
-    throw {
-      code: 400,
-      message: "Algo deu errado! \n Confira seus dados",
-    };
+    throw badRequest;
   }
 
   if (!currentPreferences) {
