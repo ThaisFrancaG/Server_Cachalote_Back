@@ -2,8 +2,130 @@ import jwt from "jsonwebtoken";
 import userRepository from "../repositories/userRepository.js";
 import preferencesRepository from "../repositories/userPreferencesRepository.js";
 
+interface UserPreferences {
+  nickname?: string;
+  avatar?: string;
+  books?: boolean;
+  mangas?: boolean;
+  novels?: boolean;
+  comics?: boolean;
+  showPublicNotifications?: boolean;
+  showFriendsNotifications?: boolean;
+  getPublicNotifications?: boolean;
+  getFriendsNotifications?: boolean;
+}
+
+interface ProfilePreferences {
+  userId: number;
+  avatar?: string;
+  nickName?: string;
+  likesBooks?: boolean;
+  likesNovels?: boolean;
+  likesManga?: boolean;
+  likesComics?: boolean;
+}
+
+interface NotificationsPreferences {
+  userId: number;
+  showPublic?: boolean;
+  showFriends?: boolean;
+  getPublic?: boolean;
+  getFriends?: boolean;
+}
+async function profilePreferences(
+  token: string,
+  userPreferences: UserPreferences
+) {
+  const userInfo = await userData(token);
+  const userId = userInfo.id;
+  const { nickname, avatar, books, mangas, novels, comics } = userPreferences;
+  const profileInfo = {
+    userId: userId,
+    avatar: avatar,
+    nickName: nickname,
+    likesBooks: books,
+    likesNovels: novels,
+    likesMangas: mangas,
+    likesComics: comics,
+  };
+  const preferences = await checkPreferences(userId, "profile");
+  preferences;
+  if (preferences === "update") {
+  } else if (preferences === "create") {
+    await createProfile(profileInfo);
+  } else {
+    throw {
+      code: 400,
+      message: "Algo deu errado! \n Confira seus dados",
+    };
+  }
+}
+
+async function notificationsPreferences(
+  token: string,
+  userPreferences: UserPreferences
+) {
+  const userInfo = await userData(token);
+  const userId = userInfo.id;
+  const {
+    showPublicNotifications,
+    showFriendsNotifications,
+    getPublicNotifications,
+    getFriendsNotifications,
+  } = userPreferences;
+  const profileInfo = {
+    userId: userId,
+    showPublic: showPublicNotifications,
+    showFriends: showFriendsNotifications,
+    getPublic: getPublicNotifications,
+    getFriends: getFriendsNotifications,
+  };
+  const preferences = await checkPreferences(userId, "notifications");
+  if (preferences === "update") {
+  } else if (preferences === "create") {
+    await createNotifications(profileInfo);
+  } else {
+    throw {
+      code: 400,
+      message: "Algo deu errado! \n Confira seus dados",
+    };
+  }
+}
+
+async function checkPreferences(userId: number, preferences: string) {
+  let currentPreferences;
+
+  if (preferences === "profile") {
+    console.log("conferir preferencias profile");
+    currentPreferences = await preferencesRepository.profilePreferencesById(
+      userId
+    );
+    console.log("profile" + currentPreferences);
+  } else if (preferences === "notifications") {
+    currentPreferences =
+      await preferencesRepository.notificationsPreferencesById(userId);
+  } else {
+    throw {
+      code: 400,
+      message: "Algo deu errado! \n Confira seus dados",
+    };
+  }
+
+  if (!currentPreferences) {
+    return "create";
+  } else {
+    return "update";
+  }
+}
+
+async function createProfile(preferences: ProfilePreferences) {
+  await preferencesRepository.createProfilePreferences(preferences);
+}
+
+async function createNotifications(preferences: NotificationsPreferences) {
+  await preferencesRepository.createNotificationsPreferences(preferences);
+}
 async function userData(token: string) {
-  console.log("chegou no service");
   try {
     const passKey = process.env.JWT_SECRET as string;
 
@@ -11,7 +133,9 @@ async function userData(token: string) {
 
     const getUser = await userRepository.userByEmail(email);
     const userId = getUser[0].id;
-    const getPreferences = await preferencesRepository.preferencesById(userId);
+    const getPreferences = await preferencesRepository.profilePreferencesById(
+      userId
+    );
 
     const userInfo = {
       id: userId,
@@ -28,4 +152,10 @@ async function userData(token: string) {
   }
 }
 
-export { userData };
+export {
+  userData,
+  profilePreferences,
+  notificationsPreferences,
+  ProfilePreferences,
+  NotificationsPreferences,
+};
