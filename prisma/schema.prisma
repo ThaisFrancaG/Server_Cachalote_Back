@@ -28,35 +28,36 @@ model Users {
 
 model UserPreferences {
   id          Int     @id @default(autoincrement())
-  user        Users   @relation(fields: [userID], references: [id])
-  userID      Int
+  user        Users   @relation(fields: [userId], references: [id])
+  userId      Int
   avatar      String?
+  nickName    String?
   likesBooks  Boolean @default(true)
-  likesNovels Boolean @default(true)
-  likesManga  Boolean @default(true)
-  likesComics Boolean @default(true)
+  likesNovels Boolean @default(false)
+  likesMangas Boolean @default(true)
+  likesComics Boolean @default(false)
 
   @@map("userPreferences")
 }
 
 model UserNotifications {
   id          Int     @id @default(autoincrement())
-  user        Users   @relation(fields: [userID], references: [id])
-  userID      Int
-  showPublic  Boolean @default(true)
-  showFriends Boolean @default(true)
-  getPublic   Boolean @default(true)
-  getFriends  Boolean @default(true)
+  user        Users   @relation(fields: [userId], references: [id])
+  userId      Int
+  showPublic  Boolean @default(false)
+  showFriends Boolean @default(false)
+  getPublic   Boolean @default(false)
+  getFriends  Boolean @default(false)
 
   @@map("userNotifications")
 }
 
 model Relations {
   id         Int     @id @default(autoincrement())
-  userAsking Users   @relation("whoAsked", fields: [whoAskedID], references: [id])
-  whoAskedID Int
-  userAsked  Users   @relation("wasAsked", fields: [wasAskedID], references: [id])
-  wasAskedID Int
+  userAsking Users   @relation("whoAsked", fields: [whoAskedId], references: [id])
+  whoAskedId Int
+  userAsked  Users   @relation("wasAsked", fields: [wasAskedId], references: [id])
+  wasAskedId Int
   confirmed  Boolean @default(false)
 
   @@map("relations")
